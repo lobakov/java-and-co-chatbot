@@ -1,0 +1,82 @@
+<!DOCTYPE module PUBLIC
+  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+  "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <module name="BeforeExecutionExclusionFileFilter">
+    </module>
+
+    <module name="TreeWalker">
+        <module name="AbbreviationAsWordInName"/>
+        <module name="AnnotationLocation"/>
+        <module name="ArrayTypeStyle"/>
+        <module name="AvoidStarImport"/>
+        <module name="CatchParameterName"/>
+        <module name="ClassTypeParameterName"/>
+        <module name="CommentsIndentation"/>
+        <module name="ConstantName">
+            <property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*)$"/>
+        </module>
+        <module name="CustomImportOrder"/>
+        <module name="CyclomaticComplexity"/>
+        <module name="EmptyBlock"/>
+        <module name="EmptyCatchBlock"/>
+        <module name="EmptyLineSeparator"/>
+        <module name="EmptyStatement"/>
+        <module name="EqualsAvoidNull"/>
+        <module name="EqualsHashCode"/>
+        <module name="FallThrough"/>
+        <module name="FinalLocalVariable"/>
+        <module name="FinalParameters"/>
+        <module name="GenericWhitespace"/>
+        <module name="HiddenField"/>
+        <module name="IllegalImport"/>
+        <module name="IllegalInstantiation"/>
+        <module name="Indentation"/>
+        <module name="InnerAssignment"/>
+        <module name="InterfaceIsType"/>
+        <module name="InterfaceTypeParameterName"/>
+        <module name="LambdaParameterName"/>
+        <module name="LeftCurly"/>
+        <module name="LocalVariableName"/>
+        <module name="MagicNumber"/>
+        <module name="MemberName"/>
+        <module name="MethodParamPad"/>
+        <module name="MethodTypeParameterName"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="ModifierOrder"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="NeedBraces"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="OneStatementPerLine"/>
+        <module name="OneTopLevelClass"/>
+        <module name="OperatorWrap"/>
+        <module name="OverloadMethodsDeclarationOrder"/>
+        <module name="OuterTypeFilename"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="ParenPad"/>
+        <module name="RedundantImport"/>
+        <module name="RedundantModifier"/>
+        <module name="RightCurly"/>
+        <module name="SeparatorWrap"/>
+        <module name="SuppressionXpathSingleFilter"/>
+        <module name="TypeName"/>
+        <module name="UnusedImports"/>
+        <module name="VariableDeclarationUsageDistance"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>    
+    </module>
+    
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true" />
+    </module>
+
+    <module name="LineLength">
+        <property name="fileExtensions" value="java" />
+        <property name="max" value="120" />
+        <property name="ignorePattern"
+            value="^package.*|^import.*|a href|href|http://|https://|ftp://" />
+    </module>
+</module>

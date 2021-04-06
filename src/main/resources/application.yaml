@@ -1,0 +1,10 @@
+server:
+    port: 8189
+    servlet:
+        context-path: /chatbot
+
+logging:
+    level:
+        org:
+            springframework:
+                boot: DEBUG
