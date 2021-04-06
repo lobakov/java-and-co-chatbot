@@ -1,10 +1,9 @@
-server:
-    port: 8189
-    servlet:
-        context-path: /chatbot
+spring:
+    main:
+        web-application-type: NONE
 
 logging:
     level:
         org:
             springframework:
-                boot: DEBUG
+                boot: off
