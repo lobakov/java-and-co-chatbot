@@ -39,7 +39,7 @@ public class UpdateHandlerImpl implements UpdateHandler {
         logger.info("Chat id:" + chatId);
         logger.info("Message text : " + text);
 
-        if (!(text.isBlank() || text.isEmpty())) {
+        if (!(text == null || text.isBlank() || text.isEmpty())) {
             SendResponse response = null;
             if (text.startsWith("/help")) {
                 response = telegramBot.execute(new SendMessage(chatId, "Ты пидор"));
