@@ -2,20 +2,15 @@ package com.github.lobakov.chatbot;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-
 import com.github.lobakov.chatbot.handler.UpdateHandler;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.GetUpdates;
-import com.pengrad.telegrambot.response.GetUpdatesResponse;
 
 @SpringBootApplication
 public class JavaAndCoChatBotApp implements CommandLineRunner {
@@ -38,6 +33,6 @@ public class JavaAndCoChatBotApp implements CommandLineRunner {
                     updates.forEach(updateHandler::handleUpdate);
                     return UpdatesListener.CONFIRMED_UPDATES_ALL;
                 }
-            });
+        });
     }
 }

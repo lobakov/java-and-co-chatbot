@@ -40,9 +40,12 @@ public class UpdateHandlerImpl implements UpdateHandler {
         logger.info("Message text : " + text);
 
         if (!(text.isBlank() || text.isEmpty())) {
+            SendResponse response = null;
             if (text.startsWith("/help")) {
-                SendResponse response = telegramBot.execute(new SendMessage(chatId, "Ты пидор"));
+                response = telegramBot.execute(new SendMessage(chatId, "Ты пидор"));
                 logger.info(response.message().toString());
+            } else {
+                response = telegramBot.execute(new SendMessage(chatId, text));
             }
         }
     }
