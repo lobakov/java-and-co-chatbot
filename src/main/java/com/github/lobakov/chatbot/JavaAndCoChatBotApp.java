@@ -1,38 +1,29 @@
 package com.github.lobakov.chatbot;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.github.lobakov.chatbot.config.ChatBotConfig;
 import com.github.lobakov.chatbot.handler.UpdateHandler;
+import com.github.lobakov.chatbot.handler.UpdateHandlerImpl;
+import com.github.lobakov.chatbot.listener.ChatBotAppListener;
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.Update;
 
 @SpringBootApplication
-public class JavaAndCoChatBotApp implements CommandLineRunner {
-
-    @Autowired
-    private UpdateHandler updateHandler;
-
-    @Autowired
-    private TelegramBot telegramBot;
+public class JavaAndCoChatBotApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(JavaAndCoChatBotApp.class, args);
-    }
+        ApplicationContext context = new AnnotationConfigApplicationContext(ChatBotConfig.class);
+        TelegramBot telegramBot = context.getBean(TelegramBot.class);
+        UpdateHandler updateHandler = context.getBean(UpdateHandlerImpl.class);
 
-    @Override
-    public void run(String... args) throws Exception {
-        telegramBot.setUpdatesListener(new UpdatesListener() {
-                @Override
-                public int process(List<Update> updates) {
-                    updates.forEach(updateHandler::handleUpdate);
-                    return UpdatesListener.CONFIRMED_UPDATES_ALL;
-                }
-        });
+        SpringApplication springApplication = new SpringApplication(JavaAndCoChatBotApp.class);
+        springApplication.addListeners(new ChatBotAppListener(telegramBot, updateHandler));
+        springApplication.run(args);
+
+        ((ConfigurableApplicationContext) context).close();
     }
 }
