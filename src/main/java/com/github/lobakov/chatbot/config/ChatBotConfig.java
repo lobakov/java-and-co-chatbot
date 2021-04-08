@@ -11,8 +11,8 @@ import com.pengrad.telegrambot.TelegramBot;
 @Configuration
 public class ChatBotConfig {
 
-    //@Value("${BOT}")
-    private String token = "1711316625:AAE-2suorW2fLhBPyah4k5zVO8qlvIjwj4o";
+    @Value("${BOT}")
+    private String token;
     private TelegramBot telegramBot;
 
     @Bean
