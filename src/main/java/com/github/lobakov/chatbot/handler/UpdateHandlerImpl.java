@@ -1,10 +1,12 @@
 package com.github.lobakov.chatbot.handler;
 
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.User;
@@ -19,12 +21,22 @@ import com.pengrad.telegrambot.response.GetChatResponse;
 
 public class UpdateHandlerImpl implements UpdateHandler {
 
+    private static final int UNBAN_INDEX = 0;
+    private static final int PARENT_INDEX = 1;
+    private static final int CHAT_INDEX = 2;
+    private static final int USER_INDEX = 3;
+    private static final int INVITE_INDEX = 4;
     private static final int CHAT_ID_OFFSET = 4;
     private static final int START_LENGTH = 6;
+    private static final String DELIMITER = ":";
+    private static final String INVITE_PREFIX = "https://t.me/joinchat/";
+    private static final String JOIN_BUTTON = "Вступить в группу";
     private static final String NL = System.lineSeparator();
     private static final String START_PATTERN = "^/start -?\\d+$";
     private static final String TELEGRAM_PREFIX = "https://t.me/c/";
     private static final String UNBAN_BUTTON = "Разбаньте меня";
+    private static final String UNBAN_REQUEST = "UB";
+    private static final String UNBANNED = "Вы были разбанены";
     private static final String WARNING = "Вы точно прочитали <a href=\"%s\">правила</a>?" + NL
             + "Если да - то нажимайте \"Разбаньте меня\", но не выебывайтесь за нарушения.";
 
@@ -38,8 +50,11 @@ public class UpdateHandlerImpl implements UpdateHandler {
     @Override
     public void handleUpdate(Update update) {
         Message message = update.message();
+        CallbackQuery callbackQuery = update.callbackQuery();
 
-        if (message != null) {
+        if (callbackQuery != null) {
+            unbanUser(callbackQuery.data());
+        } else if (message != null) {
             banNewUsers(message);
             handleMessage(message);
         }
@@ -68,6 +83,7 @@ public class UpdateHandlerImpl implements UpdateHandler {
 
     private void handleText(Long chatId, int userId, String text) {
         Pattern pattern = Pattern.compile(START_PATTERN);
+
         if (text.startsWith("/help")) {
             telegramBot.execute(new SendMessage(chatId, "Ты пидор"));
         } else if (pattern.matcher(text).matches()) {
@@ -83,7 +99,7 @@ public class UpdateHandlerImpl implements UpdateHandler {
         String rulesUrl = composeRulesUrl(parentChatId, rulesId);
         String message = String.format(WARNING, rulesUrl);
         String inviteLink = chat.chat().inviteLink();
-        unbanUser(chatId, userId, message, inviteLink);
+        confirmUnban(parentChatId, chatId, userId, message, inviteLink);
     }
 
     private String composeRulesUrl(Long parentChatId, int rulesId) {
@@ -91,14 +107,42 @@ public class UpdateHandlerImpl implements UpdateHandler {
         return TELEGRAM_PREFIX + chatId + "/" + rulesId;
     }
 
-    private void unbanUser(Long chatId, int userId, String message, String inviteLink) {
-        telegramBot.execute(new UnbanChatMember(chatId, userId).onlyIfBanned(true));
+    private void confirmUnban(Long parentChatId, Long chatId, int userId, String message, String joinLink) {
+        String inviteLink = joinLink.substring(INVITE_PREFIX.length());
+
+        StringJoiner joiner = new StringJoiner(DELIMITER);
+        joiner.add(UNBAN_REQUEST)
+              .add(parentChatId.toString())
+              .add(chatId.toString())
+              .add(Integer.toString(userId))
+              .add(inviteLink);
+
         telegramBot.execute(new SendMessage(chatId, message)
-                .parseMode(ParseMode.HTML)
-                .disableWebPagePreview(true)
-                .replyMarkup(new InlineKeyboardMarkup(
+                   .parseMode(ParseMode.HTML)
+                   .disableWebPagePreview(true)
+                   .replyMarkup(new InlineKeyboardMarkup(
                         new InlineKeyboardButton[] {
-                                new InlineKeyboardButton(UNBAN_BUTTON).url(inviteLink)
+                                new InlineKeyboardButton(UNBAN_BUTTON).callbackData(joiner.toString())
+                        })));
+    }
+
+    private void unbanUser(String callbackData) {
+        String[] callback = callbackData.split(DELIMITER);
+
+        if (!callback[UNBAN_INDEX].equals(UNBAN_REQUEST)) {
+            return;
+        }
+
+        Long parentChatId = Long.valueOf(callback[PARENT_INDEX]);
+        Long chatId = Long.valueOf(callback[CHAT_INDEX]);
+        int userId = Integer.valueOf(callback[USER_INDEX]);
+        String joinLink = callback[INVITE_INDEX];
+        String inviteLink = INVITE_PREFIX + joinLink;
+        telegramBot.execute(new UnbanChatMember(parentChatId, userId).onlyIfBanned(true));
+        telegramBot.execute(new SendMessage(chatId, UNBANNED)
+                   .replyMarkup(new InlineKeyboardMarkup(
+                        new InlineKeyboardButton[] {
+                                new InlineKeyboardButton(JOIN_BUTTON).url(inviteLink)
                         })));
     }
 }
